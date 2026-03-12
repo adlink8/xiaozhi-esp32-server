@@ -109,3 +109,48 @@ ESP32 设备 → WebSocket → xiaozhi-server (Python) → AI 服务 (ASR/LLM/TT
 1. **精确提问**: 说明模块名（xiaozhi-server/manager-api/manager-web）
 2. **提供上下文**: 附上错误日志或相关配置
 3. **分步骤**: 复杂任务拆成多个小问题
+
+Xiaozhi ESP32 Server - Claude Code 规则
+
+## 项目架构
+- **xiaozhi-server**: Python AI 引擎（WebSocket + ASR/TTS/LLM）
+- **manager-api**: Java Spring Boot 管理后端
+- **manager-web**: Vue.js Web 前端
+- **manager-mobile**: uni-app 移动端
+
+## 技术栈约定
+- Python: 使用 asyncio、websockets、pydantic
+- Java: Spring Boot 3.x, MyBatis, MySQL
+- Vue: Vue 3 + Vite + Element Plus
+- 部署: Docker Compose
+
+## 代码规范
+- Python: 遵循 PEP 8，使用类型注解
+- JavaScript/Vue: ESLint + Prettier
+- Java: 遵循 Google Java Style
+
+## 开发流程
+1. 所有功能先在本地测试，再部署 Docker
+2. API 修改需同步更新 manager-api 和 xiaozhi-server
+3. 前端组件优先使用 Element Plus
+
+## 常见任务
+- 添加新 AI 模型: 修改 `main/xiaozhi-server/app/services/llm/`
+- 添加设备控制: 修改 `main/manager-api/src/main/java/com/**.controller/`
+- 修改 UI: `main/manager-web/src/views/`
+
+## 提问建议
+- 问"如何添加 X 功能"时，说明要改哪个模块（Python/Java/Vue）
+- 问代码位置时，先说明是"前端"/"后端"/"AI 引擎"
+- 提供错误信息时，附上完整的日志栈
+
+## 快捷命令
+- `@arch`: 解释整体架构 → 读取 CLAUDE_GUIDE.md
+- `@deploy`: 部署步骤 → 读取 docker-setup.sh + README.md
+- `@api`: 查看 API 列表 → 扫描 manager-api/controller
+
+## 项目术语
+- **小智**: 指 ESP32 智能音箱硬件
+- **AI 引擎**: 指 xiaozhi-server (Python 后端)
+- **管理端**: 指 manager-api + manager-web
+- **VAD**: Voice Activity Detection (语音活动检测)
