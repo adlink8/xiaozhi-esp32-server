@@ -220,7 +220,7 @@ selected_module:
   # 语音识别模块，默认使用FunASR本地模型
   ASR: FunASR
   # 将根据配置名称对应的type调用实际的LLM适配器
-  LLM: ChatGLMLLM
+  LLM: KimiLLM
   # 视觉语言大模型
   VLLM: ChatGLMVLLM
   # TTS将根据配置名称对应的type调用实际的TTS适配器
@@ -701,6 +701,17 @@ LLM:
     # Xinference服务地址和模型名称
     model_name: qwen2.5:3b-AWQ  # 使用的小模型名称，用于意图识别
     base_url: http://localhost:9997  # Xinference服务地址
+  KimiLLM:
+    # Minimax大模型API
+    type: openai
+    api_key: sk-9W2kXXHhqIC5GGx9SOFTWzO2EeQn5jb4A2ezcWq67Xj0phSF
+    base_url: https://api.moonshot.cn/v1
+    model_name: moonshot-v1-8k
+    temperature: 0.7
+    max_tokens: 2048
+    top_p: 1
+    frequency_penalty: 0
+    presence_penalty: 0
 # VLLM配置（视觉语言大模型）
 VLLM:
   ChatGLMVLLM:

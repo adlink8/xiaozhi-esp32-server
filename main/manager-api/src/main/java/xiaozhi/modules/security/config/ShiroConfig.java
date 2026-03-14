@@ -22,7 +22,7 @@ import xiaozhi.modules.security.secret.ServerSecretFilter;
 import xiaozhi.modules.sys.service.SysParamsService;
 
 /**
- * Shiro的配置文件
+ * Shiro 的配置文件
  * Copyright (c) 人人开源 All rights reserved.
  * Website: https://www.renren.io
  */
@@ -57,13 +57,13 @@ public class ShiroConfig {
         shiroFilter.setShiroFilterConfiguration(config);
 
         Map<String, Filter> filters = new HashMap<>();
-        // oauth过滤
+        // oauth 过滤
         filters.put("oauth2", new Oauth2Filter());
         // 服务密钥过滤
         filters.put("server", new ServerSecretFilter(sysParamsService));
         shiroFilter.setFilters(filters);
 
-        // 添加Shiro的内置过滤器
+        // 添加 Shiro 的内置过滤器
         /*
          * anon：无需认证就可以访问
          * authc：必须认证了才能让问
@@ -72,8 +72,24 @@ public class ShiroConfig {
          * role：拥有某个角色权限才能访问
          */
         Map<String, String> filterMap = new LinkedHashMap<>();
+        // OTA 接口（ESP32 设备和智控台使用）
         filterMap.put("/ota/**", "anon");
         filterMap.put("/otaMag/download/**", "anon");
+        // 智控台接口（带/xiaozhi 前缀，nginx 转发后使用）
+        filterMap.put("/xiaozhi/ota/**", "anon");
+        filterMap.put("/xiaozhi/otaMag/download/**", "anon");
+        filterMap.put("/xiaozhi/webjars/**", "anon");
+        filterMap.put("/xiaozhi/druid/**", "anon");
+        filterMap.put("/xiaozhi/v3/api-docs/**", "anon");
+        filterMap.put("/xiaozhi/doc.html", "anon");
+        filterMap.put("/xiaozhi/favicon.ico", "anon");
+        filterMap.put("/xiaozhi/user/captcha", "anon");
+        filterMap.put("/xiaozhi/user/smsVerification", "anon");
+        filterMap.put("/xiaozhi/user/login", "anon");
+        filterMap.put("/xiaozhi/user/pub-config", "anon");
+        filterMap.put("/xiaozhi/user/register", "anon");
+        filterMap.put("/xiaozhi/user/retrieve-password", "anon");
+        // 不带/xiaozhi 前缀的路径（nginx 转发后的实际路径）
         filterMap.put("/webjars/**", "anon");
         filterMap.put("/druid/**", "anon");
         filterMap.put("/v3/api-docs/**", "anon");
@@ -85,13 +101,19 @@ public class ShiroConfig {
         filterMap.put("/user/pub-config", "anon");
         filterMap.put("/user/register", "anon");
         filterMap.put("/user/retrieve-password", "anon");
-        // 将config路径使用server服务过滤器
+        // 将 config 路径使用 server 服务过滤器
         filterMap.put("/config/**", "server");
+        filterMap.put("/xiaozhi/config/**", "server");
         filterMap.put("/agent/chat-history/report", "server");
+        filterMap.put("/xiaozhi/agent/chat-history/report", "server");
         filterMap.put("/agent/chat-history/download/**", "anon");
+        filterMap.put("/xiaozhi/agent/chat-history/download/**", "anon");
         filterMap.put("/agent/chat-summary/**", "server");
+        filterMap.put("/xiaozhi/agent/chat-summary/**", "server");
         filterMap.put("/agent/play/**", "anon");
+        filterMap.put("/xiaozhi/agent/play/**", "anon");
         filterMap.put("/voiceClone/play/**", "anon");
+        filterMap.put("/xiaozhi/voiceClone/play/**", "anon");
         filterMap.put("/**", "oauth2");
         shiroFilter.setFilterChainDefinitionMap(filterMap);
 

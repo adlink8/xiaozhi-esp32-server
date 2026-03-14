@@ -1,0 +1,66 @@
+{
+  "project": "xiaozhi-esp32-server",
+  "version": "0.9.1",
+  "last_updated": "2026-03-13",
+  "deployment_path": "/home/li/xiaozhi/xiaozhi-esp32-server/main/xiaozhi-server",
+  "config_files": {
+    "docker_compose": "./docker-compose_all.yml",
+    "process": "./process.json",
+    "server_config": "./data/.config.yaml"
+  },
+  "endpoints": {
+    "websocket": "ws://192.168.1.105:8100/xiaozhi/v1/",
+    "api": "http://192.168.1.105:8102",
+    "ota": "http://192.168.1.105:8102/ota/",
+    "web_console": "http://192.168.1.105:8101",
+    "vision": "http://192.168.1.105:8103/mcp/vision/explain"
+  },
+  "services": {
+    "xiaozhi-esp32-server": {
+      "description": "Python AI 引擎 - WebSocket 服务",
+      "image": "ghcr.nju.edu.cn/xinnan-tech/xiaozhi-esp32-server:server_latest",
+      "ports": {
+        "websocket": { "host": 8100, "container": 8000 },
+        "http": { "host": 8103, "container": 8003 }
+      }
+    },
+    "xiaozhi-esp32-server-web": {
+      "description": "Java Spring Boot 后端 + Vue 前端",
+      "image": "xiaozhi-esp32-server-web:local",
+      "ports": {
+        "web_ui": { "host": 8101, "container": 8002 },
+        "api": { "host": 8102, "container": 8002 }
+      }
+    },
+    "xiaozhi-esp32-server-db": {
+      "description": "MySQL 数据库",
+      "image": "mysql:latest",
+      "ports": { "mysql": { "internal": 3306 } }
+    },
+    "xiaozhi-esp32-server-redis": {
+      "description": "Redis 缓存",
+      "image": "redis:8.0",
+      "ports": { "redis": { "internal": 6379 } }
+    }
+  },
+  "database": {
+    "host": "xiaozhi-esp32-server-db",
+    "port": 3306,
+    "name": "xiaozhi_esp32_server",
+    "user": "root",
+    "password": "123456"
+  },
+  "redis": {
+    "host": "xiaozhi-esp32-server-redis",
+    "port": 6379
+  },
+  "model": {
+    "name": "SenseVoiceSmall",
+    "path": "./models/SenseVoiceSmall/model.pt",
+    "size_mb": 893
+  },
+  "admin": {
+    "username": "admin",
+    "password": "Admin@123"
+  }
+}

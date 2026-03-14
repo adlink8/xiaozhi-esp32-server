@@ -64,7 +64,8 @@ class WebSocketServer:
         self.auth_enable = auth_config.get("enabled", False)
         # 设备白名单
         self.allowed_devices = set(auth_config.get("allowed_devices", []))
-        secret_key = self.config["server"]["auth_key"]
+        # auth_key 可能在 app.py 中设置，如果不存在则使用默认值
+        secret_key = self.config["server"].get("auth_key", "default-auth-key")
         expire_seconds = auth_config.get("expire_seconds", None)
         self.auth = AuthManager(secret_key=secret_key, expire_seconds=expire_seconds)
 

@@ -14,9 +14,9 @@ services:
       - default
     ports:
       # ws服务端
-      - "8000:8000"
+      - "8100:8000"
       # http服务的端口，用于视觉分析接口
-      - "8003:8003"
+      - "8103:8003"
     security_opt:
       - seccomp:unconfined
     environment:
@@ -29,7 +29,7 @@ services:
 
   # manager-api和manager-web模块
   xiaozhi-esp32-server-web:
-    image: ghcr.nju.edu.cn/xinnan-tech/xiaozhi-esp32-server:web_latest
+    image: xiaozhi-esp32-server-web:local
     container_name: xiaozhi-esp32-server-web
     restart: always
     networks:
@@ -41,7 +41,9 @@ services:
         condition: service_healthy
     ports:
       # 智控台
-      - "8002:8002"
+      - "8101:8002"
+      # manager-api 后端
+      - "8102:8002"
     environment:
       - TZ=Asia/Shanghai
       - SPRING_DATASOURCE_DRUID_URL=jdbc:mysql://xiaozhi-esp32-server-db:3306/xiaozhi_esp32_server?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&nullCatalogMeansCurrent=true&connectTimeout=30000&socketTimeout=30000&autoReconnect=true&failOverReadOnly=false&maxReconnects=10
