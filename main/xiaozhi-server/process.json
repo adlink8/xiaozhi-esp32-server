@@ -9,11 +9,11 @@
     "server_config": "./data/.config.yaml"
   },
   "endpoints": {
-    "websocket": "ws://192.168.1.105:8100/xiaozhi/v1/",
-    "api": "http://192.168.1.105:8102",
-    "ota": "http://192.168.1.105:8102/ota/",
-    "web_console": "http://192.168.1.105:8101",
-    "vision": "http://192.168.1.105:8103/mcp/vision/explain"
+    "websocket": "ws://<SERVER_IP>:8100/xiaozhi/v1/",
+    "api": "http://<SERVER_IP>:8102",
+    "ota": "http://<SERVER_IP>:8102/ota/",
+    "web_console": "http://<SERVER_IP>:8101",
+    "vision": "http://<SERVER_IP>:8103/mcp/vision/explain"
   },
   "services": {
     "xiaozhi-esp32-server": {
@@ -48,7 +48,7 @@
     "port": 3306,
     "name": "xiaozhi_esp32_server",
     "user": "root",
-    "password": "123456"
+    "password": "<DB_PASSWORD>"
   },
   "redis": {
     "host": "xiaozhi-esp32-server-redis",
@@ -61,6 +61,6 @@
   },
   "admin": {
     "username": "admin",
-    "password": "Admin@123"
+    "password": "<ADMIN_PASSWORD>"
   }
 }

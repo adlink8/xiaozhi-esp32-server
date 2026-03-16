@@ -9,9 +9,9 @@
 
 | 项目 | 配置 |
 |------|------|
-| 设备型号 | xingzhi-cube-1.54tft-wifi |
-| MAC 地址 | 98:88:e0:16:3e:e8 |
-| 固件版本 | 1.9.4 |
+| 设备型号 | xingzhi-cube-1.54tft-wifi（示例） |
+| MAC 地址 | <DEVICE_MAC> |
+| 固件版本 | 1.9.4（示例） |
 | 连接方式 | WiFi |
 
 ### 1.2 硬件组成
@@ -32,13 +32,13 @@
 | 操作系统 | Linux (WSL2 Ubuntu) |
 | Python 版本 | 3.12 |
 | 虚拟环境 | `/home/li/xiaozhi/xiaozhi-esp32-server/venv` |
-| 部署 IP | 192.168.1.105 |
+| 部署 IP | <SERVER_IP> |
 
 ### 2.2 端口映射
 
 | 宿主机端口 | 容器端口 | 用途 |
 |-----------|---------|------|
-| 8100 | 8000 | WebSocket (音频流) |
+|  8100| 8100 | WebSocket (音频流) |
 | 8101 | 8002 | 智控台 Web UI |
 | 8102 | 8003 | manager-api 后端 |
 | 3307 | 3306 | MySQL |
@@ -47,7 +47,7 @@
 ### 2.3 OTA 升级地址
 
 ```
-http://192.168.1.105:8102/ota/
+http://<SERVER_IP>:8102/ota/
 ```
 
 ---
@@ -58,12 +58,13 @@ http://192.168.1.105:8102/ota/
 
 本次配置使用的是 **Kimi API**（月之暗面），不是 MinMax API。
 
-### 3.2 API 凭据
+### 3.2 API 凭据（请勿提交到仓库）
+
+> 不要在文档/代码中写入真实 API Key。建议使用环境变量或本地私有配置文件（如 `data/.config.yaml`），并确保其在 `.gitignore` 中。
 
 | 项目 | 值 |
 |------|-----|
-| API Key | `sk-9W2kXXHhqIC5GGx9SOFTWzO2EeQn5jb4A2ezcWq67Xj0phSF` |
-| API Key 类型 | ak-f8toi15zao8111gzwj4i |
+| API Key | `<YOUR_KIMI_API_KEY>` |
 
 ### 3.3 配置文件修改
 
@@ -78,7 +79,7 @@ LLM:
   KimiLLM:
     # Kimi 大模型 API（月之暗面）
     type: openai
-    api_key: sk-9W2kXXHhqIC5GGx9SOFTWzO2EeQn5jb4A2ezcWq67Xj0phSF
+    api_key: <YOUR_KIMI_API_KEY>  # 建议通过环境变量注入，而不是写入仓库
     base_url: https://api.moonshot.cn/v1
     model_name: moonshot-v1-8k
     temperature: 0.7
@@ -157,7 +158,7 @@ nohup python3 app.py > /dev/null 2>&1 &
 在智控台中配置或直接在设备固件中设置：
 
 ```
-WebSocket 地址：ws://192.168.1.105:8100/xiaozhi/v1/
+WebSocket 地址：ws://<SERVER_IP>:8100/xiaozhi/v1/
 ```
 
 ### 5.3 验证连接
@@ -202,7 +203,7 @@ server:
 | 问题 | 可能原因 | 解决方案 |
 |------|---------|---------|
 | 连接超时 | IP 地址错误 | 确认服务器 IP 与设备配置的 IP 一致 |
-| 拒绝连接 | 端口被占用 | 检查端口 8100 是否被其他程序占用 |
+| 拒绝连接 | 端口被占用 | 检查端口  8100是否被其他程序占用 |
 | 认证失败 | auth_key 不匹配 | 检查设备和服务器的 auth_key 配置 |
 
 ### 7.2 服务器启动失败
@@ -210,7 +211,7 @@ server:
 | 问题 | 可能原因 | 解决方案 |
 |------|---------|---------|
 | 模块未找到 | 依赖未安装 | `source venv/bin/activate && pip install -r requirements.txt` |
-| 端口被占用 | 端口已被使用 | `lsof -i :8000` 查看并停止占用进程 |
+| 端口被占用 | 端口已被使用 | `lsof -i :8100` 查看并停止占用进程 |
 
 ---
 
@@ -263,7 +264,7 @@ python3 app.py &
 | LLM 模型 | KimiLLM |
 | 模型名称 | moonshot-v1-8k |
 | API 地址 | https://api.moonshot.cn/v1 |
-| API Key | sk-9W2kXXHhqIC5GGx9SOFTWzO2EeQn5jb4A2ezcWq67Xj0phSF |
+| API Key | <REDACTED> |
 | 服务器进程 | 运行中 |
 
 ### 10.2 验证配置是否生效
@@ -275,3 +276,33 @@ grep -A 10 "KimiLLM:" main/xiaozhi-server/config.yaml
 # 查看 selected_module 设置
 grep "LLM:" main/xiaozhi-server/config.yaml | head -1
 ```
+
+---
+
+## 十一、实际连接测试记录
+
+### 11.1 连接时间：2026-03-14 22:34:52
+
+**连接信息：**
+- 设备 ID：`<DEVICE_MAC>`
+- 设备型号：`xingzhi-cube-1.54tft-wifi`
+- 固件版本：`2.2.3`
+- 服务器 IP：`<SERVER_IP>`
+- 设备 IP：`<DEVICE_IP>`
+
+### 11.2 连接成功日志
+
+```
+22:34:52 - 设备 WebSocket 连接成功
+22:34:52 - LLM 组件初始化成功 (KimiLLM)
+22:34:53 - 设备 MCP 工具注册成功 (4 个工具)
+22:34:59 - 语音识别成功："Hello."
+22:35:04 - TTS 语音合成成功："Hello there"
+```
+
+### 11.3 连接成功条件总结
+
+1. 设备和服务器在同一局域网（192.168.1.x）
+2. 服务器 WebSocket 端口（8100）正常监听
+3. 配置文件正确加载 KimiLLM
+4. 设备固件中配置的服务器地址正确

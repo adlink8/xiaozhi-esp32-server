@@ -12,12 +12,13 @@
 | [📡 OTA 连接错误](#ota-connection-error) | ESP32 设备无法连接、端口配置错误 |
 | [🔧 OTA 接口 404 错误](#ota-404-fix) | context-path 配置问题 |
 | [⚙️ server.ota 参数配置](#server-ota-config) | IP 变更更新、Redis 缓存清理 |
+| [🌐 IP变动导致设备连接不稳定](#ip-change-solution) | 计算机IP变化、设备无法连接、配置硬编码IP |
 | [📥 OTA 升级失败](#ota-upgrade-fail) | 设备 auto_update、Redis UUID、nginx 配置 |
 | [🐳 容器端口映射](#container-port-mapping) | 端口混淆、容器间网络通信 |
 
 ---
 
-## 🔐 server-secret-mismatch（服务器密钥不匹配）
+\## 🔐 server-secret-mismatch（服务器密钥不匹配）
 
 ### 适用场景
 - xiaozhi-server 容器启动失败，日志显示 `无效的服务器密钥`
@@ -46,7 +47,7 @@ cat /home/li/xiaozhi/xiaozhi-esp32-server/main/xiaozhi-server/data/.config.yaml
 
 **4. 检查数据库中的密钥**
 ```bash
-docker exec xiaozhi-esp32-server-db mysql -uroot -p123456 -e \
+docker exec xiaozhi-esp32-server-db mysql -uroot -p<MYSQL_ROOT_PASSWORD> -e \
   "SELECT param_value FROM xiaozhi_esp32_server.sys_params WHERE param_code = 'server.secret';"
 ```
 
@@ -259,7 +260,7 @@ docker exec xiaozhi-esp32-server-web wget -qO- http://localhost:8003/ota/
 ### 快速诊断
 ```bash
 # 1. 检查数据库中的参数值
-docker exec xiaozhi-esp32-server-db mysql -uroot -p123456 xiaozhi_esp32_server \
+docker exec xiaozhi-esp32-server-db mysql -uroot -p<MYSQL_ROOT_PASSWORD> xiaozhi_esp32_server \
   -e "SELECT param_code, param_value FROM sys_params WHERE param_code IN ('server.ota', 'server.mqtt_gateway', 'server.websocket');"
 
 # 2. 检查 Redis 缓存
@@ -276,7 +277,7 @@ curl -s http://localhost:8102/xiaozhi/ota/
 # 替换为你的实际 IP 或域名
 YOUR_IP_OR_DOMAIN="10.205.150.28"
 
-docker exec xiaozhi-esp32-server-db mysql -uroot -p123456 xiaozhi_esp32_server \
+docker exec xiaozhi-esp32-server-db mysql -uroot -p<MYSQL_ROOT_PASSWORD> xiaozhi_esp32_server \
   -e "UPDATE sys_params SET param_value = 'http://${YOUR_IP_OR_DOMAIN}:8102/ota/' WHERE param_code = 'server.ota'; \
       UPDATE sys_params SET param_value = 'mqtt://${YOUR_IP_OR_DOMAIN}:8100' WHERE param_code = 'server.mqtt_gateway';"
 ```
@@ -323,7 +324,7 @@ curl -s http://localhost:8102/xiaozhi/ota/
    ```bash
    #!/bin/bash
    NEW_IP=$(curl -s ifconfig.me)  # 获取当前公网 IP
-   docker exec xiaozhi-esp32-server-db mysql -uroot -p123456 xiaozhi_esp32_server \
+   docker exec xiaozhi-esp32-server-db mysql -uroot -p<MYSQL_ROOT_PASSWORD> xiaozhi_esp32_server \
      -e "UPDATE sys_params SET param_value = 'http://${NEW_IP}:8102/ota/' WHERE param_code = 'server.ota';"
    docker exec xiaozhi-esp32-server-redis redis-cli DEL sys:params
    ```
@@ -333,6 +334,171 @@ curl -s http://localhost:8102/xiaozhi/ota/
 **OTA 接口返回 "缺少 ota 地址"**
 - 原因：数据库中 `server.ota` 值为 `null` 或 Redis 缓存未更新
 - 解决：按上述步骤更新数据库并清除 Redis 缓存
+
+---
+
+## 🌐 ip-change-solution（IP变动导致设备连接不稳定）
+
+### 适用场景
+- 计算机IP地址发生变化后，ESP32设备无法连接到服务器
+- 智控台参数设置中 `server.ota` 显示连接错误
+- 设备通过OTA接口获取的WebSocket地址与当前IP不符
+- 切换WiFi网络、重启路由器后设备无法正常使用
+
+### 快速诊断
+
+```bash
+# 1. 查看当前IP地址
+ip addr show | grep "inet " | grep -v 127.0.0.1
+
+# 2. 访问OTA接口查看返回的WebSocket地址
+curl http://localhost:8102/xiaozhi/ota/
+# 或（不使用智控台时）
+curl http://localhost:8102/ota/
+
+# 3. 检查配置文件中的WebSocket地址
+grep -A 5 "websocket:" main/xiaozhi-server/data/.config.yaml
+
+# 4. 检查数据库中的参数值（使用智控台时）
+docker exec xiaozhi-esp32-server-db mysql -uroot -p<MYSQL_ROOT_PASSWORD> xiaozhi_esp32_server \
+  -e "SELECT param_code, param_value FROM sys_params WHERE param_code IN ('server.ota', 'server.websocket');"
+
+# 5. 检查Redis缓存
+docker exec xiaozhi-esp32-server-redis redis-cli hgetall 'sys:params' | grep server.ota
+```
+
+### 问题原因分析
+
+#### 原因 1：配置文件中硬编码了IP地址
+
+当配置文件中使用了固定的IP地址时：
+
+```yaml
+server:
+  websocket: ws://192.168.1.100:8100/xiaozhi/v1/
+  vision_explain: http://192.168.1.100:8102/mcp/vision/explain
+```
+
+一旦IP地址发生变化，设备仍然会尝试连接旧的IP地址。
+
+#### 原因 2：数据库参数未更新（智控台模式）
+
+使用智控台时，`server.ota` 和 `server.websocket` 参数存储在数据库中，IP变化后需要更新。
+
+#### 原因 3：Redis缓存未刷新
+
+即使更新了数据库，Redis缓存可能仍保留旧值。
+
+### 解决方案
+
+#### 方案 1：使用占位符（推荐，本地模式）
+
+**适用场景**：局域网环境，IP地址经常变化，不使用智控台
+
+**配置方法**：
+
+编辑配置文件 `main/xiaozhi-server/data/.config.yaml`：
+
+```yaml
+server:
+  # 使用占位符，系统会自动检测当前IP
+  websocket: ws://你的ip或者域名:8100/xiaozhi/v1/
+  vision_explain: http://你的ip或者域名:8102/mcp/vision/explain
+  port: 8100      # WebSocket服务端口
+  http_port: 8102 # HTTP服务端口
+```
+
+**工作原理**：
+- 系统检测配置中包含"你的"占位符
+- 每次OTA请求时调用 `get_local_ip()` 获取当前IP
+- 自动生成包含当前IP的WebSocket地址
+
+**优点**：
+- 配置简单，无需额外软件
+- 自动适应IP变化
+- 无需重启服务即可生效
+
+#### 方案 2：更新数据库参数（智控台模式）
+
+**步骤 1：更新数据库中的参数值**
+
+```bash
+# 替换为你的实际IP
+YOUR_IP="<SERVER_IP>"
+
+# 更新OTA地址
+docker exec xiaozhi-esp32-server-db mysql -uroot -p<MYSQL_ROOT_PASSWORD> xiaozhi_esp32_server \
+  -e "UPDATE sys_params SET param_value = 'http://${YOUR_IP}:8102/ota/' WHERE param_code = 'server.ota';"
+
+# 更新WebSocket地址（如果使用）
+docker exec xiaozhi-esp32-server-db mysql -uroot -p<MYSQL_ROOT_PASSWORD> xiaozhi_esp32_server \
+  -e "UPDATE sys_params SET param_value = 'ws://${YOUR_IP}:8100/xiaozhi/v1/' WHERE param_code = 'server.websocket';"
+```
+
+**步骤 2：清除Redis缓存**
+
+```bash
+docker exec xiaozhi-esp32-server-redis redis-cli DEL sys:params
+```
+
+#### 方案 3：使用DDNS动态域名
+
+**适用场景**：需要从外网访问，或希望使用固定的域名地址
+
+**配置方法**：
+
+1. 注册DDNS服务（DuckDNS、No-IP、花生壳等）
+2. 配置DDNS客户端定期更新IP
+3. 在配置文件或数据库中使用域名：
+
+```yaml
+server:
+  websocket: ws://your-domain.duckdns.org:8100/xiaozhi/v1/
+  vision_explain: http://your-domain.duckdns.org:8102/mcp/vision/explain
+```
+
+### 验证配置是否正确
+
+```bash
+# 方法 1：检查OTA接口返回的地址
+curl http://localhost:8102/ota/
+# 预期输出：OTA接口运行正常，向设备发送的websocket地址是：ws://当前IP:8100/xiaozhi/v1/
+
+# 方法 2：检查服务启动日志
+# 启动服务时，日志会显示当前地址
+```
+
+### 常见问题排查
+
+| 问题 | 可能原因 | 解决方案 |
+|------|---------|---------|
+| 配置了占位符，但地址仍不正确 | 系统无法访问外网检测IP | 检查网络连接，确保能访问8.8.8.8 |
+| 设备连接成功但无法语音交互 | 防火墙阻止WebSocket | 开放8100和8102端口 |
+| Docker部署设备无法连接 | 配置使用了容器内端口 | 使用宿主机端口8100/8102 |
+| 更新数据库后仍使用旧地址 | Redis缓存未刷新 | 清除Redis缓存 |
+
+### 端口说明
+
+| 容器 | 内部端口 | 宿主机端口 | 用途 |
+|------|---------|-----------|------|
+| xiaozhi-esp32-server-web | 8002 | **8101** | 智控台 Web UI |
+| xiaozhi-esp32-server-web | 8003 | **8102** | manager-api 后端 |
+| xiaozhi-esp32-server | 8000 | **8100** | WebSocket 服务 |
+
+**记忆口诀**：
+- **8101** = 智控台（人用的，浏览器）
+- **8102** = manager-api（设备用的，接口调用）
+- **8100** = WebSocket（音频流）
+
+### 相关文件
+
+| 文件 | 作用 |
+|------|------|
+| `data/.config.yaml` | xiaozhi-server 本地配置文件 |
+| `ota_handler.py` | OTA接口处理器，生成WebSocket地址 |
+| `util.py` | 工具函数，包含 `get_local_ip()` |
+| `sys_params` 表 | 系统参数存储（智控台模式） |
+
 
 ---
 
@@ -350,15 +516,15 @@ E (153684) Ota: Failed to download firmware
 
 **检查方法：**
 ```bash
-docker exec xiaozhi-esp32-server-db mysql -uroot -p123456 xiaozhi_esp32_server \
-  -e "SELECT id, mac_address, auto_update FROM ai_device WHERE mac_address='98:88:e0:16:3e:e8';"
+docker exec xiaozhi-esp32-server-db mysql -uroot -p<MYSQL_ROOT_PASSWORD> xiaozhi_esp32_server \
+  -e "SELECT id, mac_address, auto_update FROM ai_device WHERE mac_address='<DEVICE_MAC>';"
 ```
 
 **解决方案：**
 ```bash
 # 启用自动升级
-docker exec xiaozhi-esp32-server-db mysql -uroot -p123456 xiaozhi_esp32_server \
-  -e "UPDATE ai_device SET auto_update=1 WHERE mac_address='98:88:e0:16:3e:e8';"
+docker exec xiaozhi-esp32-server-db mysql -uroot -p<MYSQL_ROOT_PASSWORD> xiaozhi_esp32_server \
+  -e "UPDATE ai_device SET auto_update=1 WHERE mac_address='<DEVICE_MAC>';"
 ```
 
 #### 原因 2：Redis UUID 缓存过期或格式错误
@@ -406,7 +572,7 @@ location /xiaozhi/otaMag/ {
 **检查方法：**
 ```bash
 # 查看数据库中的固件路径
-docker exec xiaozhi-esp32-server-db mysql -uroot -p123456 xiaozhi_esp32_server \
+docker exec xiaozhi-esp32-server-db mysql -uroot -p<MYSQL_ROOT_PASSWORD> xiaozhi_esp32_server \
   -e "SELECT id, firmware_name, firmware_path FROM ai_ota;"
 
 # 检查容器内文件是否存在
@@ -421,14 +587,14 @@ docker exec xiaozhi-esp32-server-web ls -la /uploadfile/
 **步骤 1：检查设备状态**
 ```bash
 # 检查设备是否激活，auto_update 是否为 1
-docker exec xiaozhi-esp32-server-db mysql -uroot -p123456 xiaozhi_esp32_server \
+docker exec xiaozhi-esp32-server-db mysql -uroot -p<MYSQL_ROOT_PASSWORD> xiaozhi_esp32_server \
   -e "SELECT id, mac_address, app_version, auto_update FROM ai_device;"
 ```
 
 **步骤 2：检查固件列表**
 ```bash
 # 查看可用的固件版本
-docker exec xiaozhi-esp32-server-db mysql -uroot -p123456 xiaozhi_esp32_server \
+docker exec xiaozhi-esp32-server-db mysql -uroot -p<MYSQL_ROOT_PASSWORD> xiaozhi_esp32_server \
   -e "SELECT id, type, version, firmware_path FROM ai_ota;"
 ```
 
@@ -436,7 +602,7 @@ docker exec xiaozhi-esp32-server-db mysql -uroot -p123456 xiaozhi_esp32_server \
 ```bash
 # 模拟 ESP32 请求
 curl -s -X POST "http://localhost:8102/ota/" \
-  -H "Device-Id: 98:88:e0:16:3e:e8" \
+  -H "Device-Id: <DEVICE_MAC>" \
   -H "Content-Type: application/json" \
   -d '{"application":{"version":"1.9.4"},"board":{"type":"xingzhi-cube-1.54tft-wifi"}}' | grep firmware
 ```
@@ -521,7 +687,7 @@ docker logs xiaozhi-esp32-server-web --tail 50 # manager-api 日志
 docker logs xiaozhi-esp32-server-db --tail 50  # MySQL 日志
 
 # ===== 数据库检查 =====
-docker exec xiaozhi-esp32-server-db mysql -uroot -p123456 -e \
+docker exec xiaozhi-esp32-server-db mysql -uroot -p<MYSQL_ROOT_PASSWORD> -e \
   "SELECT param_code, param_value FROM xiaozhi_esp32_server.sys_params \
    WHERE param_code IN ('server.secret', 'server.ota', 'server.websocket');"
 
@@ -541,6 +707,7 @@ curl http://localhost:8102/ota/                                     # OTA 接口
 
 | 日期 | 技能 | 说明 |
 |------|------|------|
+| 2026-03-16 | ip-change-solution | 新增：IP变动导致设备连接不稳定问题解决方案 |
 | 2026-03-12 | server-secret-mismatch | 新增：服务器密钥不匹配问题诊断 |
 | 2026-03-12 | ota-404-fix | 新增：OTA 接口 404 错误修复（context-path） |
 | 2026-03-12 | ota-connection-error | 整合：OTA 连接错误诊断 |
@@ -629,7 +796,7 @@ server:
 # 编辑 config.yaml 或 selected_module 对应的 LLM 配置
 LLM:
   your-provider:
-    api_key: sk-your-real-api-key
+    api_key: <YOUR_API_KEY>
 ```
 
 **注意：** 此错误不影响服务启动，但会导致 AI 对话功能无法使用
@@ -639,7 +806,7 @@ LLM:
 **症状：**
 日志显示：
 ```
-WebSocket 地址是 ws://ws://192.168.1.105:8100/xiaozhi/v1/
+WebSocket 地址是 ws://ws://<SERVER_IP>:8100/xiaozhi/v1/
 ```
 
 **原因：** `app.py` 中输出时重复添加了 `ws://` 前缀

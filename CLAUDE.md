@@ -164,10 +164,10 @@ Xiaozhi ESP32 Server - Claude Code 规则
 
 ## 硬件配置
 - **设备型号**: xingzhi-cube-1.54tft-wifi
-- **MAC 地址**: 98:88:e0:16:3e:e8
+- **MAC 地址**: <DEVICE_MAC>
 - **固件版本**: 1.9.4
-- **OTA 地址**: `http://192.168.1.105:8102/ota/`
-- **部署 IP**: 192.168.1.105
+- **OTA 地址**: `http://<SERVER_IP>:8102/ota/`
+- **部署 IP**: <SERVER_IP>
 
 ## 端口映射
 | 宿主机端口 | 容器端口 | 用途 |

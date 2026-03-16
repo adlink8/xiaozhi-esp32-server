@@ -44,8 +44,8 @@ cd /home/li/xiaozhi/xiaozhi-esp32-server/main/xiaozhi-server
 
 查看日志输出：
 ```
-Websocket 地址是 ws://192.168.1.105:8100/xiaozhi/v1/
-视觉分析接口是 http://192.168.1.105:8102/mcp/vision/explain
+Websocket 地址是 ws://<SERVER_IP>:8100/xiaozhi/v1/
+视觉分析接口是 http://<SERVER_IP>:8102/mcp/vision/explain
 ```
 
 ## 配置说明
@@ -127,10 +127,10 @@ server:
 本地运行时，设备端 WebSocket 地址：
 
 ```
-ws://192.168.1.105:8100/xiaozhi/v1/
+ws://<SERVER_IP>:8100/xiaozhi/v1/
 ```
 
-- IP：宿主机 IP（192.168.1.105）
+- IP：宿主机 IP（<SERVER_IP>）
 - 端口：Docker 映射端口（8100 → 容器内 8000）
 - 路径：`/xiaozhi/v1/`
 
