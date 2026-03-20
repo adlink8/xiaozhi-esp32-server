@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-<a href="./docs/FAQ.md">常见问题</a>
+<a href="./docs/operations/FAQ.md">常见问题</a>
 · <a href="https://github.com/xinnan-tech/xiaozhi-esp32-server/issues">反馈问题</a>
 · <a href="./README.md#%E9%83%A8%E7%BD%B2%E6%96%87%E6%A1%A3">部署文档</a>
 · <a href="https://github.com/xinnan-tech/xiaozhi-esp32-server/releases">更新日志</a>
@@ -184,10 +184,10 @@ Spearheaded by Professor Siyuan Liu's Team (South China University of Technology
 #### 🚀 部署方式选择
 | 部署方式 | 特点 | 适用场景 | 部署文档 | 配置要求 | 视频教程 | 
 |---------|------|---------|---------|---------|---------|
-| **最简化安装** | 智能对话、单智能体管理 | 低配置环境，数据存储在配置文件，无需数据库 | [①Docker版](./docs/Deployment.md#%E6%96%B9%E5%BC%8F%E4%B8%80docker%E5%8F%AA%E8%BF%90%E8%A1%8Cserver) / [②源码部署](./docs/Deployment.md#%E6%96%B9%E5%BC%8F%E4%BA%8C%E6%9C%AC%E5%9C%B0%E6%BA%90%E7%A0%81%E5%8F%AA%E8%BF%90%E8%A1%8Cserver)| 如果使用`FunASR`要2核4G，如果全API，要2核2G | - | 
-| **全模块安装** | 智能对话、多用户管理、多智能体管理、智控台界面操作 | 完整功能体验，数据存储在数据库 |[①Docker版](./docs/Deployment_all.md#%E6%96%B9%E5%BC%8F%E4%B8%80docker%E8%BF%90%E8%A1%8C%E5%85%A8%E6%A8%A1%E5%9D%97) / [②源码部署](./docs/Deployment_all.md#%E6%96%B9%E5%BC%8F%E4%BA%8C%E6%9C%AC%E5%9C%B0%E6%BA%90%E7%A0%81%E8%BF%90%E8%A1%8C%E5%85%A8%E6%A8%A1%E5%9D%97) / [③源码部署自动更新教程](./docs/dev-ops-integration.md) | 如果使用`FunASR`要4核8G，如果全API，要2核4G| [本地源码启动视频教程](https://www.bilibili.com/video/BV1wBJhz4Ewe) | 
+| **最简化安装** | 智能对话、单智能体管理 | 低配置环境，数据存储在配置文件，无需数据库 | [①Docker版](./docs/deployment/Deployment.md#%E6%96%B9%E5%BC%8F%E4%B8%80docker%E5%8F%AA%E8%BF%90%E8%A1%8Cserver) / [②源码部署](./docs/deployment/Deployment.md#%E6%96%B9%E5%BC%8F%E4%BA%8C%E6%9C%AC%E5%9C%B0%E6%BA%90%E7%A0%81%E5%8F%AA%E8%BF%90%E8%A1%8Cserver)| 如果使用`FunASR`要2核4G，如果全API，要2核2G | - | 
+| **全模块安装** | 智能对话、多用户管理、多智能体管理、智控台界面操作 | 完整功能体验，数据存储在数据库 |[①Docker版](./docs/deployment/Deployment_all.md#%E6%96%B9%E5%BC%8F%E4%B8%80docker%E8%BF%90%E8%A1%8C%E5%85%A8%E6%A8%A1%E5%9D%97) / [②源码部署](./docs/deployment/Deployment_all.md#%E6%96%B9%E5%BC%8F%E4%BA%8C%E6%9C%AC%E5%9C%B0%E6%BA%90%E7%A0%81%E8%BF%90%E8%A1%8C%E5%85%A8%E6%A8%A1%E5%9D%97) / [③源码部署自动更新教程](./docs/operations/dev-ops-integration.md) | 如果使用`FunASR`要4核8G，如果全API，要2核4G| [本地源码启动视频教程](https://www.bilibili.com/video/BV1wBJhz4Ewe) | 
 
-常见问题及相关教程，可参考[这个链接](./docs/FAQ.md)
+常见问题及相关教程，可参考[这个链接](./docs/operations/FAQ.md)
 
 > 💡 提示：以下是按最新代码部署后的测试平台，有需要可烧录测试，并发为6个，每天会清空数据，
 
@@ -237,7 +237,7 @@ Websocket接口地址: wss://2662r3426b.vicp.fun/xiaozhi/v1/
 ![请参考-全模块安装架构图](docs/images/deploy2.png)
 | 功能模块 | 描述 |
 |:---:|:---|
-| 核心架构 | 基于[MQTT+UDP网关](https://github.com/xinnan-tech/xiaozhi-esp32-server/blob/main/docs/mqtt-gateway-integration.md)、WebSocket、HTTP服务器，提供完整的控制台管理和认证系统 |
+| 核心架构 | 基于[MQTT+UDP网关](https://github.com/xinnan-tech/xiaozhi-esp32-server/blob/main/docs/integrations/core/mqtt-gateway-integration.md)、WebSocket、HTTP服务器，提供完整的控制台管理和认证系统 |
 | 语音交互 | 支持流式ASR(语音识别)、流式TTS(语音合成)、VAD(语音活动检测)，支持多语言识别和语音处理 |
 | 声纹识别 | 支持多用户声纹注册、管理和识别，与ASR并行处理，实时识别说话人身份并传递给LLM进行个性化回应 |
 | 智能对话 | 支持多种LLM(大语言模型)，实现智能对话 |
@@ -254,9 +254,9 @@ Websocket接口地址: wss://2662r3426b.vicp.fun/xiaozhi/v1/
 
 ### 正在开发 🚧
 
-想了解具体开发计划进度，[请点击这里](https://github.com/users/xinnan-tech/projects/3)。常见问题及相关教程，可参考[这个链接](./docs/FAQ.md)
+想了解具体开发计划进度，[请点击这里](https://github.com/users/xinnan-tech/projects/3)。常见问题及相关教程，可参考[这个链接](./docs/operations/FAQ.md)
 
-如果你是一名软件开发者，这里有一份[《致开发者的公开信》](docs/contributor_open_letter.md)，欢迎加入！
+如果你是一名软件开发者，这里有一份[《致开发者的公开信》](docs/community/contributor_open_letter.md)，欢迎加入！
 
 ---
 
@@ -331,7 +331,7 @@ Websocket接口地址: wss://2662r3426b.vicp.fun/xiaozhi/v1/
 |   类型   |      平台名称       | 使用方式 |   收费模式    | 备注 |
 |:------:|:---------------:|:----:|:---------:|:--:|
 | Memory |     mem0ai      | 接口调用 | 1000次/月额度 |    |
-| Memory |     [powermem](./docs/powermem-integration.md)    | 本地总结 | 取决于LLM和DB |  OceanBase开源，支持智能检索  |
+| Memory |     [powermem](./docs/integrations/memory/powermem-integration.md)    | 本地总结 | 取决于LLM和DB |  OceanBase开源，支持智能检索  |
 | Memory | mem_local_short | 本地总结 |    免费     |    |
 | Memory |     nomem       | 无记忆模式 |    免费     |    |
 

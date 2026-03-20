@@ -1,5 +1,5 @@
 # 部署架构图
-![请参考-全模块安装架构图](../docs/images/deploy2.png)
+![请参考-全模块安装架构图](../images/deploy2.png)
 # 方式一：Docker运行全模块
 `0.8.2`版本开始，本项目发行的docker镜像只支持`x86架构`，如果需要在`arm64架构`的CPU上部署，可按照[这个教程](docker-build.md)在本机编译`arm64的镜像`。
 
@@ -337,11 +337,11 @@ npm run serve
 重要提示！windows 用户，可以通过安装`Anaconda`来管理环境。安装好`Anaconda`后，在`开始`那里搜索`anaconda`相关的关键词，
 找到`Anaconda Prpmpt`，使用管理员身份运行它。如下图。
 
-![conda_prompt](./images/conda_env_1.png)
+![conda_prompt](../images/conda_env_1.png)
 
 运行之后，如果你能看到命令行窗口前面有一个(base)字样，说明你成功进入了`conda`环境。那么你就可以执行以下命令了。
 
-![conda_env](./images/conda_env_2.png)
+![conda_env](../images/conda_env_2.png)
 
 ```
 conda remove -n xiaozhi-esp32-server --all -y
