@@ -1,24 +1,24 @@
 ---
 name: project-management
-description: 项目管理工作流技能。当用户输入 -start、-progress、-next、-update-status 命令时触发。基于文件的上下文记忆系统，维护需求文档、项目状态、待办清单等核心文档。
+description: (Deprecated) Legacy project-management skill. Prefer `.claude/skills/manage-project/` which uses `project/` docs + AUTOGEN-safe updates.
 ---
 
-# Project Management - 项目管理工作流技能
+# Project Management（Legacy / Deprecated）
 
-你是一个"需要依赖外部文本存储记忆的项目经理"。在回答任何项目管理相关问题前，你必须先读取项目的上下文文件。你的核心职责是维护项目进度、分析任务优先级、并提供可执行的行动指导。
+本文件为**旧版入口**，保留仅用于兼容与历史参考。
 
-## 核心文档系统
+✅ 新版请使用：`.claude/skills/manage-project/`
 
-在执行任何操作前，必须识别并维护以下文档（如果存在）：
+新版约定（权威文件）：
 
 | 文档路径 | 用途 |
 |---------|------|
-| `docs/需求文档.md` 或 `docs/requirements.md` | 项目目标、优先级、预计时间、验收标准 |
-| `docs/项目状态.md` 或 `docs/project-status.md` | 当前状态、已完成任务、进行中任务、待办事项（**最核心**） |
-| `docs/待办清单.md` 或 `docs/todo.md` | 接下来的规划，按紧急重要程度组织 |
-| `CLAUDE.md` 或 `CODEBUDDY.md` 或 `README.md` | 项目资源概览，了解模块路由和位置 |
+| `project/requirements.md` | 需求与范围（主要手写） |
+| `project/project-status.md` | 项目状态总览（手写 + AUTOGEN 快照） |
+| `project/todo.md` | 任务清单（手写 + AUTOGEN，支持结构化任务 schema） |
 
-**重要**：如果这些文档不存在，应在首次运行时提醒用户创建。
+规则：
+- 自动化更新（`-update-status`）只能修改 AUTOGEN 标记区块，禁止覆盖手写内容。
 
 ---
 
