@@ -5,7 +5,7 @@
 > - **手写区**：你维护的真实任务（建议结构化），用于 `-next/-progress` 等工作流。
 
 <!-- AUTOGEN:DISCOVERED_TASKS:START -->
-_Generated at: 2026-03-20 21:21:27 +0800_
+_Generated at: 2026-03-20 22:39:23 +0800_
 
 - Totals: TODO=0, FIXME=0
 

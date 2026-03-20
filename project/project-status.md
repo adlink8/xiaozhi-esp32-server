@@ -5,32 +5,24 @@
 > - **手写状态**：你维护的项目事实与阶段目标。
 
 <!-- AUTOGEN:PROJECT_SNAPSHOT:START -->
-_Generated at: 2026-03-20 21:21:27 +0800_
+_Generated at: 2026-03-20 22:39:23 +0800_
 
 - Git branch: `feat/websocket`
-- Git HEAD: `f70717a3`
+- Git HEAD: `a5d00b8d`
 - TODO/FIXME in repo: TODO=0, FIXME=0
 
 ### Recent commits (5)
 ```
+a5d00b8d Update CLAUDE.md navigation
+d642cb25 Reorganize docs and skills navigation
+d869f573 feat: add manage-project skill and project docs
 f70717a3 feat: Add initial documentation files for project requirements, status, and todo list
 40518f63 feat: Add project management workflow and troubleshooting manual
-74fca440 feat: add diagnostic skills index and hardware connection configuration
-25471e26 Add comprehensive integration guides for various components
-1f3ca3b3 :chore: 添加Claude Code配置 更新 gitignor
 ```
 
 ### Working tree (porcelain)
 ```
-RM docs/project-status.md -> project/project-status.md
-R  docs/requirements.md -> project/requirements.md
-RM docs/todo.md -> project/todo.md
-?? .claude/skills/diagnose-xiaozhi-issue/
-?? .claude/skills/grill-me/
-?? .claude/skills/manage-project/
-?? .claude/skills/write-a-skill/
-?? PROJECT_STRUCTURE_ANALYSIS.md
-?? me/
+M project/project-status.md
 ```
 <!-- AUTOGEN:PROJECT_SNAPSHOT:END -->
 
@@ -45,8 +37,8 @@ RM docs/todo.md -> project/todo.md
   - `main/manager-web`：Vue.js Web 管理前端
   - `main/manager-mobile`：uni-app 移动端
 - **部署方式**（按你的实际情况补充）：
-  - Docker 最简化安装 / 全模块安装（参考 docs/Deployment*.md）
-  - 源码模式运行（参考 CLAUDE.md 中“本地运行指南”）
+  - Docker 最简化安装 / 全模块安装（参考 `docs/deployment/` + `docs/index.md`）
+  - 源码模式运行（参考 `.claude/references/config-local-run-guide.md`）
 
 ---
 
@@ -96,6 +88,12 @@ RM docs/todo.md -> project/todo.md
 
 ## 6. 更新记录（手写）
 
+> 这里记录“对开发协作有影响”的变更（文档结构、skills 工作流、分支约定等）。
+
 | 日期 | 修改人 | 变更内容 |
 |------|--------|----------|
-| 2026-03-16 | （自动生成，待你更新） | 创建初稿：模块概览 + 状态表 + 待办视图 |
+| 2026-03-20 | Copilot + 用户 | 重构 CLAUDE.md 为首屏导航与规则；对齐 skills/references/project/docs 的权威入口；补充分支约定（feat/websocket + test）。 |
+| 2026-03-20 | Copilot + 用户 | docs 按主题分类（deployment/hardware/integrations/operations/tools/community），并更新 docs 索引与相关链接。 |
+| 2026-03-20 | Copilot + 用户 | skills 索引与导航对齐：新增 `.claude/skills/index.md`；排障统一入口迁移到 `diagnose-xiaozhi-issue`；`project-management.md/ip-change.md` 等旧入口删除/弃用。 |
+| 2026-03-20 | Copilot + 用户 | `.claude/references/README.md` 增强为导航入口；`docs-nav/hardware-setup` 归档到 `.claude/references/`。 |
+| 2026-03-16 | （历史） | 创建初稿：模块概览 + 状态表 + 待办视图 |
